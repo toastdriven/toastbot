@@ -334,3 +334,61 @@ Toastbot.prototype.metar = function(nick, text) {
   return true;
 };
 Toastbot.prototype.metar.__doc__ = "Fetch a NOAA METAR by station code.";
+
+Toastbot.prototype.twitter = function(nick, text) {
+  var self = this;
+  var to_me = self.said_to_me(text);
+  
+  if(to_me[0] != 'direct') {
+    return null;
+  }
+  
+  // Use the modified text.
+  text = to_me[1];
+  
+  if(text.indexOf('twitter') != 0) {
+    return null;
+  }
+  
+  var search_terms = text.replace('twitter ', '');
+  var options = {
+    host: 'search.twitter.com',
+    method: 'GET',
+    path: '/search.json?rpp=5&result_type=recent&q='+escape(search_terms),
+    headers: {
+      'User-Agent': 'Mozilla/4.0 (toastbot)'
+    }
+  };
+  
+  var req = http.get(options, function(res) {
+    if(res.statusCode.toString() == '200') {
+      var buffer = '';
+      
+      res.on('data', function(data) {
+        buffer += data;
+      });
+      
+      res.on('end', function() {
+        var data = JSON.parse(buffer);
+        var results = [
+          nick+': Top 5 results'
+        ];
+        
+        for(var offset in data['results']) {
+          var tweet = data['results'][offset];
+          results.push('   - @'+tweet.from_user+': '+tweet.text);
+        }
+        self.say(results);
+      })
+    }
+    else {
+      self.log("Failed to load Twitter search for '"+search_terms+"': "+res.statusCode);
+      self.say(nick+': Sorry, Twitter isn\'t responding.');
+    }
+  }).on('error', function(e) {
+    self.log("Failed to load wiki entry for '"+search_terms+"': "+e.message);
+  });
+  
+  return true;
+};
+Toastbot.prototype.twitter.__doc__ = "Search Twitter for a topic.";

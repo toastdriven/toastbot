@@ -19,6 +19,7 @@ var bot = new toastbot.Toastbot({
     'dance',
     'wiki',
     'metar',
+    'twitter',
   ]
 });
 bot.setup();
