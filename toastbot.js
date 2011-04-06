@@ -177,7 +177,7 @@ Toastbot.prototype.help = function(nick, text) {
   ];
   
   for(var offset in self.handlers) {
-    var command = "   "+self.handlers[offset];
+    var command = "   - "+self.handlers[offset];
     
     if(self[self.handlers[offset]].hasOwnProperty('__doc__') == true) {
       command += " = "+self[self.handlers[offset]].__doc__;
@@ -286,9 +286,9 @@ Toastbot.prototype.wiki = function(nick, text) {
   };
   
   var req = http.get(options, function(res) {
-      if(res.statusCode.toString() == '302') {
-        self.say(nick+': '+res.headers['location']);
-      }
+    if(res.statusCode.toString() == '302') {
+      self.say(nick+': '+res.headers['location']);
+    }
   }).on('error', function(e) {
     self.log("Failed to load wiki entry for '"+search_terms+"': "+e.message);
   });
