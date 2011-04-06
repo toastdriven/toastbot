@@ -17,6 +17,7 @@ var bot = new toastbot.Toastbot({
   handlers: [
     'help',
     'dance',
+    'wiki',
   ]
 });
 bot.setup();

@@ -1,4 +1,5 @@
 var fs = require('fs');
+var http = require('http');
 var irc = require('irc');
 var path = require('path');
 
@@ -258,3 +259,39 @@ Toastbot.prototype.dance = function(nick, text) {
 };
 Toastbot.prototype.dance.__doc__ = "Get down and funky.";
 
+Toastbot.prototype.wiki = function(nick, text) {
+  var self = this;
+  var to_me = self.said_to_me(text);
+  
+  if(to_me[0] != 'direct') {
+    return null;
+  }
+  
+  // Use the modified text.
+  text = to_me[1];
+  
+  if(text.indexOf('wiki') != 0) {
+    return null;
+  }
+  
+  var search_terms = text.replace('wiki ', '');
+  var options = {
+    host: 'en.wikipedia.org',
+    method: 'GET',
+    path: '/w/index.php?search='+escape(search_terms),
+    headers: {
+      'User-Agent': 'Mozilla/4.0 (toastbot)'
+    }
+  };
+  
+  var req = http.get(options, function(res) {
+      if(res.statusCode.toString() == '302') {
+        self.say(nick+': '+res.headers['location']);
+      }
+  }).on('error', function(e) {
+    self.log("Failed to load wiki entry for '"+search_terms+"': "+e.message);
+  });
+  
+  return true;
+};
+Toastbot.prototype.wiki.__doc__ = "Search Wikipedia for a topic.";
