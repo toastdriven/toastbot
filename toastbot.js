@@ -2,6 +2,7 @@ var fs = require('fs');
 var http = require('http');
 var irc = require('irc');
 var path = require('path');
+var spawn = require('child_process').spawn;
 
 
 var zero_pad = function(value, width) {
@@ -295,3 +296,41 @@ Toastbot.prototype.wiki = function(nick, text) {
   return true;
 };
 Toastbot.prototype.wiki.__doc__ = "Search Wikipedia for a topic.";
+
+Toastbot.prototype.metar = function(nick, text) {
+  var self = this;
+  var to_me = self.said_to_me(text);
+  
+  if(to_me[0] != 'direct') {
+    return null;
+  }
+  
+  // Use the modified text.
+  text = to_me[1];
+  
+  if(text.indexOf('metar') != 0) {
+    return null;
+  }
+  
+  var station = text.replace('metar ', '');
+  var url = 'ftp://tgftp.nws.noaa.gov/data/observations/metar/stations/'+station.toUpperCase()+'.TXT';
+  var curl = spawn('curl', [url]);
+  var buffer = '';
+  
+  curl.stdout.on('data', function (data) {
+    buffer += data;
+  });
+  
+  curl.on('exit', function (code) {
+    if(buffer.length > 0) {
+      self.say(nick+': '+buffer.replace('\n', ' ').replace('\r', ''));
+    }
+    else {
+      self.log("Failed to load metar entry for '"+station+"'.");
+      self.say(nick+': Sorry, couldn\'t find that station.')
+    }
+  });
+  
+  return true;
+};
+Toastbot.prototype.metar.__doc__ = "Fetch a NOAA METAR by station code.";
