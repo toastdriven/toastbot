@@ -108,12 +108,25 @@ Toastbot.prototype.log = function(message) {
   });
 };
 
+Toastbot.prototype.say = function(response) {
+  var self = this;
+  
+  if(response instanceof Array == false) {
+    response = [response];
+  }
+  
+  for(var roffset in response) {
+    self.log(self.nick+': '+response[roffset]);
+    self.client.say(self.channel, response[roffset]);
+  }
+};
+
 Toastbot.prototype.clean_message = function(text) {
   var clean_text = text.trim();
   // Strip off crazy chars on actions.
   clean_text = clean_text.replace(/\u0001/g, '');
   return clean_text;
-}
+};
 
 Toastbot.prototype.said_to_me = function(text) {
   var self = this;
@@ -193,15 +206,19 @@ Toastbot.prototype.handle_message = function(nick, text) {
   for(var offset in self.handlers) {
     var response = self[self.handlers[offset]](nick, clean_text);
     
-    if(response != null) {
-      if(!response instanceof Array) {
-        response = [response];
-      }
-      for(var roffset in response) {
-        self.log(self.nick+': '+response[roffset]);
-        self.client.say(self.channel, response[roffset]);
-      }
+    if(response == null) {
+      // Choosing not to handle this message.
+      continue;
     }
+    
+    if(response == true) {
+      // We're waiting on a callback. It'll handle the ``.say``.
+      return;
+    }
+    
+    // We got something back to say!
+    self.say(response);
+    return;
   }
 };
 
