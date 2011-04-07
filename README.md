@@ -8,6 +8,13 @@ A clean, extensible IRC bot using Node.js.
 **Version:** 0.1.0
 
 
+Requirements
+------------
+
+* Node.js 0.4.4+
+* node-irc (``npm install irc``)
+
+
 Usage
 -----
 
@@ -93,7 +100,7 @@ might look like:
     toastbot.Toastbot.prototype.how_chatty.__doc__ = "Logs how often a user has said something."
     
     // Add to handlers & run as normal.
-    var bot = new toastbot.Toastbot('testbot', '#toastdriven', {
+    var bot = new toastbot.Toastbot('testbot', '#testchannel', {
       log_dir: '/tmp/be_quiet.log',
       handlers: [
         'help',
@@ -122,6 +129,6 @@ a command that the bot responds to, you might write something like:
     // Finally, make sure it gets added to the ``handlers`` option.
 
 This checks to see if the bot is being directly addressed then returns a
-stringified version of the ``talker`` stats. The included handlers demonstrate
+string-ified version of the ``talker`` stats. The included handlers demonstrate
 even more complex behavior, such as how to do network fetches or asynchronous
 responses.
