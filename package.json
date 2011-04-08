@@ -1,9 +1,11 @@
 {
     "name" : "toastbot",
     "description" : "A clean, extensible IRC bot using Node.js.",
-    "version" : "0.1.0",
+    "version" : "0.2.0",
     "author" : "Daniel Lindsley <daniel@toastdriven.com>",
-    "contributors" : [],
+    "contributors" : [
+      "Chris Dickinson"
+    ],
     "repository" : {
         "type" : "git",
         "url" : "http://github.com/toastdriven/toastbot"
@@ -11,8 +13,16 @@
     "bugs" : {
         "web" : "http://github.com/toastdriven/toastbot/issues"
     },
-    "main" : "lib/toastbot",
-    "engines" : {"node" : ">=0.4.4"},
+    "main" : "./lib/toastbot",
+    "engines" : {
+      "node" : ">=0.4.4"
+    },
+    "dependencies" : {
+      "irc": ">=0.1.2"
+    },
+    "directories" : {
+      "lib": "./lib"
+    },
     "licenses" : [{
         "type" : "BSD",
         "url" : "http://github.com/toastdriven/toastbot/raw/master/LICENSE"

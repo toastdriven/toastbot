@@ -5,7 +5,7 @@ A clean, extensible IRC bot using Node.js.
 
 **Author:** Daniel Lindsley <daniel@toastdriven.com>  
 **License:** Dual licensed BSD/GPL  
-**Version:** 0.1.0
+**Version:** 0.2.0
 
 
 Requirements
