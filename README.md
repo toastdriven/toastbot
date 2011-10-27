@@ -3,8 +3,8 @@ Toastbot
 
 A clean, extensible IRC bot using Python, irckit, gevent & requests.
 
-**Author:** Daniel Lindsley <daniel@toastdriven.com>
-**License:** BSD
+**Author:** Daniel Lindsley<br>
+**License:** BSD<br>
 **Version:** 0.3.1
 
 
