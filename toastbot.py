@@ -66,6 +66,7 @@ class ToastBot(object):
         self.enabled_commands = [
             self.help,
             self.dance,
+            self.woodies,
             self.wiki,
             self.metar,
             self.twitter,
@@ -228,6 +229,13 @@ class ToastBot(object):
             "\\O/",
         ]
         return sweet_moves
+
+    def woodies(self, nick, text):
+        """Best quote on the internet."""
+        if not 'woodies' in text:
+            raise NotHandled()
+
+        return 'U GUYZ R THE BEST AND GIVE ME A BILLION WOODIES A DAY! [https://code.djangoproject.com/ticket/7712#comment:2]'
 
     def wiki(self, nick, text):
         """Search Wikipedia for a topic."""
