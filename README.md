@@ -1,39 +1,33 @@
 Toastbot
 ========
 
-A clean, extensible IRC bot using Node.js.
+A clean, extensible IRC bot using Python, irckit, gevent & requests.
 
-**Author:** Daniel Lindsley <daniel@toastdriven.com>  
-**License:** Dual licensed BSD/GPL  
-**Version:** 0.2.0
+**Author:** Daniel Lindsley <daniel@toastdriven.com>
+**License:** BSD
+**Version:** 0.3.1
 
 
 Requirements
 ------------
 
-* Node.js 0.4.4+
-* node-irc (``npm install irc``)
+* Python 2.6+
+* gevent
+* irckit
+* requests
 
 
 Usage
 -----
 
-Create your own ``bot.js`` file & drop in:
+Create your own ``bot.py`` file & drop in:
 
-    var toastbot = require('toastbot');
-    
-    // Simple.
-    var bot = new toastbot.Toastbot('myircbot', '#testchannel');
-    
-    // Complex.
-    // var bot = new toastbot.Toastbot('myircbot', '#testchannel', {
-    //   username: 'myircbot',
-    //   realname: 'My IRC Bot',
-    // });
-    
-    bot.setup();
+    import toastbot
 
-Then run it with ``node bot.js``.
+    bot = toastbot.ToastBot('myircbot', '#myircchannel')
+    bot.setup()
+
+Then run it with ``python bot.py``.
 
 
 Configuration
@@ -53,7 +47,7 @@ variety of non-required options.
 * ``username`` -The username the bot should identify as (default: ``nick``);
 * ``realname`` - The human readable name the bot should provide (default: 'ToastBot').
 * ``debug`` - Controls if the IRC connection should dump debug messages (default: ``false``).
-* ``log_dir`` - Controls what directory the logs should go in (default: ``install_directory/logs``).
+* ``log_dir`` - Controls what directory the logs should go in (default: ``$INSTALL_DIRECTORY/logs``).
 * ``variants`` - Used to override ways to address the bot. Should be strings (default: ``[self.nick+': ', self.nick+', ', self.nick+'- ', self.nick+' - ']``).
 
 
@@ -65,60 +59,69 @@ are simple methods hanging off the bot object. The built-in list consists of:
 
 * ``help`` - Provides a description of what I respond to.
 * ``dance`` - Get down and funky.
+* ``woodies`` - Best quote on the internet..
 * ``wiki`` - Search Wikipedia for a topic.
 * ``metar`` - Fetch a NOAA METAR by station code.
 * ``twitter`` - Search Twitter for a topic.
+* ``fatpita`` - Get a random fatpita image. For the lulz.
 
 
 Extending the bot
 -----------------
 
 Adding on further handlers is relatively simple. At its most basic, it's simply
-adding on a new method decorated with ``toastbot.handler``. For example, logging 
+adding on a new method decorated with ``toastbot.handler``. For example, logging
 how many times a user has said something in the channel might look like:
 
-    var toastbot = require('../lib/toastbot');
-    
-    // Add on the new method.
-    toastbot.Toastbot.prototype.how_chatty = toastbot.handler(toastbot.method(function(self, nick, text) {
-      self.talkers = self.talkers || {};
-      
-      if(self.talkers[nick]) {
-        self.talkers[nick] += 1;
-      }
-      else {
-        self.talkers[nick] = 1;
-      }
-      
-      // Prove it's working. In real use, you'd log to a file or a datastore.
-      console.log(JSON.stringify(self.talkers));
-    }));
-    // Add documentation for the ``how_chatty`` command.
-    toastbot.Toastbot.prototype.how_chatty.__doc__ = "Logs how often a user has said something."
-    
-    // Add to handlers & run as normal.
-    var bot = new toastbot.Toastbot('testbot', '#testchannel', {
-      log_dir: '/tmp/be_quiet.log'
-    });
-    bot.setup();
+    import toastbot
+
+    class MyBot(toastbot.ToastBot):
+        talkers = {}
+
+        def __init__(self, *args, **kwargs):
+            super(MyBot, self).__init__(*args, **kwargs)
+            self.enabled_commands += [
+                self.how_chatty,
+            ]
+
+        def how_chatty(self, nick, text):
+            """Logs how often a user has said something."""
+            if nick in self.talkers:
+                self.talkers[nick] += 1
+            else:
+                self.talkers[nick] = 1
+
+            print self.talkers.items()
+
+
+    bot = MyBot('myircbot', '#myircchannel')
+    bot.setup()
 
 Note that this command does not require addressing the bot at all. If you want
 a command that the bot responds to, you might write something like:
 
-    // Assume the previous example, but adding...
-    toastbot.Toastbot.prototype.stool_pigeon = toastbot.handler(toastbot.method(function(self, nick, text) {
-      var text = self.is_direct_command('stool_pigeon', text);
+    import toastbot
 
-      if(! text) {
-        return null;
-      }
+    class StoolPigeon(toastbot.ToastBot):
+        # Assume the previous example, but adding...
+        def __init__(self, *args, **kwargs):
+            super(StoolPigeon, self).__init__(*args, **kwargs)
+            self.enabled_commands += [
+                self.stool_pigeon,
+            ]
 
-      self.talkers = self.talkers || {};
-      return nick+': '+JSON.stringify(self.talkers);
-    }));
-    // Add documentation for the ``stool_pigeon`` command.
-    toastbot.Toastbot.prototype.stool_pigeon.__doc__ = "Rat out the talkers."
-    
+        def stool_pigeon(self, nick, text):
+            """Rat out the talkers."""
+            text = self.is_direct_command('stool_pigeon', text)
+
+            if not text:
+                raise NotHandled()
+
+            return str(self.talkers)
+
+    bot = StoolPigeon('myircbot', '#myircchannel')
+    bot.setup()
+
 This checks to see if the bot is being directly addressed then returns a
 string-ified version of the ``talker`` stats. The included handlers demonstrate
 even more complex behavior, such as how to do network fetches or asynchronous
@@ -126,15 +129,14 @@ responses.
 
 To disable handlers:
 
-    var toastbot = require('../lib/toastbot');
-    var bot = new toastbot.Toastbot('testbot', '#testchannel');
-    
-    bot.twitter.disable();
+    import toastbot
 
-    // to enable a disabled handler:
+    class MyBot(toastbot.ToastBot):
+        talkers = {}
 
-    bot.twitter.enable();
+        def __init__(self, *args, **kwargs):
+            super(MyBot, self).__init__(*args, **kwargs)
+            self.enabled_commands = [func for func in self.enabled_commands if func.__name__ != 'twitter']
 
-Using the `enable` and `disable` methods on a handler will do the obvious thing. 
-If you want to check if a particular handler is enabled, you can check using
-``bot.twitter.enabled()``.
+    bot = MyBot('myircbot', '#myircchannel')
+    bot.setup()
