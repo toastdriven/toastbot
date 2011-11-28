@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='toastbot',
-    version='0.3.1',
+    version='0.4.0',
     description='A clean, extensible IRC bot using irckit.',
     author='Daniel Lindsley',
     author_email='daniel@toastdriven.com',

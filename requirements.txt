@@ -1,3 +1,4 @@
 gevent
 irckit
 requests
+pyquery

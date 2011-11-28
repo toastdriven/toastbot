@@ -5,7 +5,7 @@ A clean, extensible IRC bot using Python, irckit, gevent & requests.
 
 **Author:** Daniel Lindsley<br>
 **License:** BSD<br>
-**Version:** 0.3.1
+**Version:** 0.4.0
 
 
 Requirements
@@ -64,6 +64,7 @@ are simple methods hanging off the bot object. The built-in list consists of:
 * ``metar`` - Fetch a NOAA METAR by station code.
 * ``twitter`` - Search Twitter for a topic.
 * ``fatpita`` - Get a random fatpita image. For the lulz.
+* ``corgibomb`` - CORGI BOMB
 
 
 Extending the bot

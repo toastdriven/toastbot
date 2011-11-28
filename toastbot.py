@@ -4,10 +4,12 @@ import irc
 import codecs
 import datetime
 import os
+import re
+import socket
 import subprocess
 import urllib
 
-import socket
+import pyquery
 import requests
 
 try:
@@ -17,7 +19,7 @@ except ImportError:
 
 
 __author__ = 'Daniel Lindsley'
-__version__ = (0, 3, 1)
+__version__ = (0, 4, 0)
 __license__ = 'BSD'
 
 
@@ -71,6 +73,7 @@ class ToastBot(object):
             self.metar,
             self.twitter,
             self.fatpita,
+            self.corgibomb,
         ]
 
     def run(self):
@@ -324,3 +327,28 @@ class ToastBot(object):
             return True
 
         return u"%s: %s" % (nick, resp.url)
+
+    def corgibomb(self, nick, text):
+        """CORGI BOMB!"""
+        text = self.is_direct_command('corgibomb', text)
+
+        if not text:
+            raise NotHandled()
+
+        resp = requests.get('http://www.tumblr.com/tagged/corgi', headers={'User-Agent': 'Mozilla/4.0 (toastbot)'})
+
+        if resp.status_code in (404, 500):
+            self.log("Failed to load corgibomb image.")
+            return True
+
+        doc = pyquery.PyQuery(resp.content)
+        corgi_js = doc('.image_thumbnail:first').attr('onclick')
+
+        # Because Tumblr LOL.
+        tumblr_rage = re.search(r"this\.src=\'(?P<pic>.*?)\'", corgi_js)
+
+        if tumblr_rage:
+            corgi_pic = tumblr_rage.groupdict()['pic']
+            return u"%s: %s" % (nick, corgi_pic)
+        else:
+            return u"%s: Sorry, Tumblr is being crappy. No pic for you." % nick
