@@ -5,7 +5,7 @@ A clean, extensible IRC bot using Python, irckit, gevent & requests.
 
 **Author:** Daniel Lindsley<br>
 **License:** BSD<br>
-**Version:** 0.4.0
+**Version:** 0.4.1
 
 
 Requirements
