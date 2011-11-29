@@ -6,6 +6,7 @@ setup(
     name='toastbot',
     version='0.4.0',
     description='A clean, extensible IRC bot using irckit.',
+    long_description=open('README.md', 'r').read(),
     author='Daniel Lindsley',
     author_email='daniel@toastdriven.com',
     py_modules = ['toastbot'],
