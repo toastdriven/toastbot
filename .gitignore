@@ -3,3 +3,5 @@
 logs
 env
 examples/toasty.py
+dist
+MANIFEST
