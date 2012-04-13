@@ -149,6 +149,9 @@ class ToastBot(object):
         self.log(u"%s left %s." % (nick, channel))
 
     def clean_message(self, text):
+        if not isinstance(text, unicode):
+            text = text.decode('utf-8', 'ignore')
+
         clean_text = text.strip()
         clean_text = clean_text.replace('\u0001', '')
         return clean_text
@@ -174,6 +177,7 @@ class ToastBot(object):
         return text
 
     def handle_channel_message(self, nick, channel, message):
+        nick = self.clean_message(nick)
         cleaned_text = self.clean_message(message)
 
         if cleaned_text.startswith('ACTION'):
@@ -250,7 +254,7 @@ class ToastBot(object):
         if not text.startswith('wiki'):
             raise NotHandled()
 
-        search_terms = text.replace('wiki ', '')
+        search_terms = text.replace('wiki ', '').encode('utf-8', 'ignore')
         resp = requests.get('http://en.wikipedia.org/w/index.php?search=%s' % urllib.quote_plus(search_terms), headers={'User-Agent': 'Mozilla/4.0 (toastbot)'})
 
         if resp.status_code in (404, 500):
@@ -290,7 +294,7 @@ class ToastBot(object):
         if not text.startswith('twitter'):
             raise NotHandled()
 
-        search_terms = text.replace('twitter ', '')
+        search_terms = text.replace('twitter ', '').encode('utf-8', 'ignore')
         resp = requests.get('http://search.twitter.com/search.json?rpp=5&result_type=recent&q=%s' % urllib.quote_plus(search_terms), headers={'User-Agent': 'Mozilla/4.0 (toastbot)'})
 
         if resp.status_code != 200:
