@@ -19,7 +19,7 @@ except ImportError:
 
 
 __author__ = 'Daniel Lindsley'
-__version__ = (0, 4, 1)
+__version__ = (0, 4, 2)
 __license__ = 'BSD'
 
 

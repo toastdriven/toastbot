@@ -7,7 +7,7 @@ README = os.path.join(os.path.dirname(__file__), 'README.md')
 
 setup(
     name='toastbot',
-    version='0.4.1',
+    version='0.4.2',
     description='A clean, extensible IRC bot using irckit.',
     long_description=open(README, 'r').read(),
     author='Daniel Lindsley',
