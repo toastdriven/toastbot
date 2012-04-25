@@ -198,12 +198,12 @@ class ToastBot(object):
                 # Nope, not that one. Try the next command.
                 continue
 
-    def handle_private_message(self, nick, text):
-        cleaned_text = self.clean_message(text)
+    def handle_private_message(self, nick, message):
+        cleaned_text = self.clean_message(message)
         self.log(u"PM <- %s: %s" % (nick, cleaned_text))
-        message = "Sorry, I don't respond to PMs yet."
-        self.log(u"PM -> %s: %s" % (nick, message))
-        self.client.respond(message, nick=nick)
+        response = "Sorry, I don't respond to PMs yet."
+        self.log(u"PM -> %s: %s" % (nick, response))
+        self.client.respond(response, nick=nick)
 
     # Available commands
     def help(self, nick, text):
